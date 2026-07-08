@@ -1,6 +1,7 @@
 import base64
 import requests
 import re
+import os
 
 # ТВОЯ ССЫЛКА НА ПОДПИСКУ
 SUB_URL = "https://backet1.csgoknife.space/config/07c738fe-31c5-4d3d-8ce6-898fe76a6a48"
@@ -51,6 +52,9 @@ def main():
     for node in ru_nodes:
         print(node)
 
+    # Создаём папку output, если её нет
+    os.makedirs("output", exist_ok=True)
+
     # Сохраняем в файл
     with open("output/russia_nodes.txt", "w", encoding="utf-8") as f:
         for node in ru_nodes:
@@ -60,24 +64,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    return ru_nodes
-
-
-def main():
-    print("Скачиваю подписку...")
-    raw_data = fetch_subscription(SUB_URL)
-
-    print("Декодирую...")
-    decoded = decode_base64(raw_data)
-
-    print("Фильтрую российские узлы...")
-    ru_nodes = filter_russian_nodes(decoded)
-
-    print("\nНайденные российские узлы:")
-    for node in ru_nodes:
-        print(node)
-
-    print("\nГотово!")
-
-if __name__ == "__main__":
-    main()
+    
