@@ -1,4 +1,4 @@
-name: Auto Filter Russia Nodes
+name: Auto Filter 
 
 on:
   schedule:
