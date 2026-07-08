@@ -1,25 +1,37 @@
 import base64
 import requests
+from urllib.parse import unquote
+
 
 # ТВОЯ ССЫЛКА НА ПОДПИСКУ
 SUB_URL = "https://backet1.csgoknife.space/config/07c738fe-31c5-4d3d-8ce6-898fe76a6a48"
 
-# Ключевые слова для фильтрации российских серверов
-RU_KEYWORDS = ["🇷🇺", "Russia", "Россия", "RU", "Moscow", "MSK", "SPB", "СПБ", "МСК"]
 
-def is_russian(node: str) -> bool:
-    return any(key.lower() in node.lower() for key in RU_KEYWORDS)
+# Ключевые слова для фильтрации российских серверов
+RU_KEYWORDS = [
+    "🇷🇺",
+    "Russia",
+    "Россия",
+    "Moscow",
+    "MSK",
+    "SPB",
+    "СПБ",
+    "МСК"
+]
+
 
 def fetch_subscription(url: str) -> str:
     response = requests.get(url, timeout=10)
     response.raise_for_status()
     return response.text
 
+
 def decode_base64(data: str) -> str:
     try:
-        return base64.b64decode(data).decode("utf-8", errors="ignore")
+        return base64.b64decode(data + "==").decode("utf-8", errors="ignore")
     except Exception:
-        return data  # если это не base64 — вернуть как есть
+        return data
+
 
 def filter_russian_nodes(subscription: str):
     lines = subscription.splitlines()
@@ -29,9 +41,15 @@ def filter_russian_nodes(subscription: str):
         if "#" not in line:
             continue
 
+        # Название сервера после #
         name = line.split("#", 1)[1].strip()
 
-        if any(key.lower() in name.lower() for key in RU_KEYWORDS):
+        # Раскодируем:
+        # %F0%9F%87%B7%F0%9F%87%BA -> 🇷🇺
+        # %D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F -> Россия
+        decoded_name = unquote(name)
+
+        if any(key.lower() in decoded_name.lower() for key in RU_KEYWORDS):
             ru_nodes.append(line)
 
     return ru_nodes
@@ -47,11 +65,18 @@ def main():
     print("Фильтрую российские узлы...")
     ru_nodes = filter_russian_nodes(decoded)
 
-    print("\nНайденные российские узлы:")
+    print("\nНайденные VLESS ссылки:")
+
     for node in ru_nodes:
         print(node)
 
-    print("\nГотово!")
+    # Запись в файл для Happ
+    with open("russia_nodes.txt", "w", encoding="utf-8") as file:
+        file.write("\n".join(ru_nodes))
+
+    print("\nВсего найдено:", len(ru_nodes))
+    print("Файл создан: russia_nodes.txt")
+
 
 if __name__ == "__main__":
     main()
