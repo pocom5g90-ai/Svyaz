@@ -1,14 +1,21 @@
 import base64
 import requests
+import re
 
 # ТВОЯ ССЫЛКА НА ПОДПИСКУ
 SUB_URL = "https://backet1.csgoknife.space/config/07c738fe-31c5-4d3d-8ce6-898fe76a6a48"
 
 # Ключевые слова для фильтрации российских серверов
-RU_KEYWORDS = ["🇷🇺", "Russia", "Россия", "RU", "Moscow", "MSK", "SPB", "СПБ", "МСК"]
-
-def is_russian(node: str) -> bool:
-    return any(key.lower() in node.lower() for key in RU_KEYWORDS)
+RU_KEYWORDS = [
+    "🇷🇺",
+    "Россия",
+    "РФ",
+    "Москва",
+    "МСК",
+    "СПБ",
+    "Питер",
+    "Россия №"
+]
 
 def fetch_subscription(url: str) -> str:
     response = requests.get(url, timeout=10)
@@ -19,7 +26,7 @@ def decode_base64(data: str) -> str:
     try:
         return base64.b64decode(data).decode("utf-8", errors="ignore")
     except Exception:
-        return data  # если это не base64 — вернуть как есть
+        return data
 
 def filter_russian_nodes(subscription: str):
     lines = subscription.splitlines()
@@ -31,11 +38,11 @@ def filter_russian_nodes(subscription: str):
 
         name = line.split("#", 1)[1].strip()
 
+        # Ищем русские слова
         if any(key.lower() in name.lower() for key in RU_KEYWORDS):
             ru_nodes.append(line)
 
     return ru_nodes
-
 
 def main():
     print("Скачиваю подписку...")
@@ -55,3 +62,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
