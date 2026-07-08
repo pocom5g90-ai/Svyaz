@@ -23,8 +23,19 @@ def decode_base64(data: str) -> str:
 
 def filter_russian_nodes(subscription: str):
     lines = subscription.splitlines()
-    ru_nodes = [line for line in lines if is_russian(line)]
+    ru_nodes = []
+
+    for line in lines:
+        if "#" not in line:
+            continue
+
+        name = line.split("#", 1)[1].strip()
+
+        if any(key.lower() in name.lower() for key in RU_KEYWORDS):
+            ru_nodes.append(line)
+
     return ru_nodes
+
 
 def main():
     print("Скачиваю подписку...")
@@ -44,4 +55,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
