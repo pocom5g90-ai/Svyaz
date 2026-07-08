@@ -1,24 +1,17 @@
-import base64
 import requests
 import re
 import os
+import urllib.parse
 
-# ТВОЯ ССЫЛКА НА ПОДПИСКУ
 SUB_URL = "https://backet1.csgoknife.space/config/07c738fe-31c5-4d3d-8ce6-898fe76a6a48"
 
-# Ловим любые варианты "Россия №394", "Россия  №  394", "Россия № 394"
+# Ищем "Россия №<число>"
 PATTERN = re.compile(r"Россия\s*№\s*\d+")
 
 def fetch_subscription(url: str) -> str:
     response = requests.get(url, timeout=10)
     response.raise_for_status()
     return response.text
-
-def decode_base64(data: str) -> str:
-    try:
-        return base64.b64decode(data).decode("utf-8", errors="ignore")
-    except Exception:
-        return data
 
 def filter_russian_nodes(subscription: str):
     lines = subscription.splitlines()
@@ -28,9 +21,13 @@ def filter_russian_nodes(subscription: str):
         if "#" not in line:
             continue
 
-        name = line.split("#", 1)[1].strip()
+        # имя узла в URL‑кодировке
+        encoded_name = line.split("#", 1)[1].strip()
 
-        # Ищем русские узлы вида "Россия №<число>"
+        # декодируем как Happ
+        name = urllib.parse.unquote(encoded_name)
+
+        # ищем "Россия №<число>"
         if PATTERN.search(name):
             ru_nodes.append(line)
 
@@ -38,13 +35,10 @@ def filter_russian_nodes(subscription: str):
 
 def main():
     print("Скачиваю подписку...")
-    raw_data = fetch_subscription(SUB_URL)
+    data = fetch_subscription(SUB_URL)
 
-    print("Пробую декодировать Base64...")
-    decoded = decode_base64(raw_data)
-
-    print("Фильтрую узлы 'Россия №<число>'...")
-    ru_nodes = filter_russian_nodes(decoded)
+    print("Декодирую имена узлов...")
+    ru_nodes = filter_russian_nodes(data)
 
     print("\nНайденные российские узлы:")
     for node in ru_nodes:
