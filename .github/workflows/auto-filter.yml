@@ -2,7 +2,7 @@ name: Auto Filter Russia Nodes
 
 on:
   schedule:
-    - cron: "0 */4 * * *"   # запуск каждые 4 часа
+    - cron: "0 */1 * * *"   # запуск каждые 4 часа
   workflow_dispatch:        # ручной запуск
 
 jobs:
