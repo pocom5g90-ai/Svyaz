@@ -1,0 +1,38 @@
+name: Auto Filter Russia Nodes
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # запуск каждые 30 мин
+  workflow_dispatch:        # ручной запуск
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run filter script
+        run: python main.py
+
+      - name: Save output
+        run: |
+          mkdir -p output
+          python main.py > output/russia_nodes.txt
+
+      - name: Commit results
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add output/russia_nodes.txt
+          git commit -m "Update Russia nodes"
+          git push
