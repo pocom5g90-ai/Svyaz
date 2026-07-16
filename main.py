@@ -10,7 +10,8 @@ SUB_URL = "https://backet1.csgoknife.space/config/07c738fe-31c5-4d3d-8ce6-898fe7
 # Ключевые слова для фильтрации российских серверов
 RU_KEYWORDS = [
     "Россия",
-    "🇩🇪 Germany | 🌐 [*CIDR] Beeline"
+    "🇩🇪 Germany | 🌐 [*CIDR] Beeline",
+    "Russia"
 ]
 
 
