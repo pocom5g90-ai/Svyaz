@@ -2,7 +2,7 @@ name: Auto Update Filter Russia Nodes
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0 */24 * * *"
   workflow_dispatch:
 
 permissions:
